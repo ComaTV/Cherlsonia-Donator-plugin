@@ -7,7 +7,7 @@ public final class Donator extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-
+        h
     }
 
     @Override
