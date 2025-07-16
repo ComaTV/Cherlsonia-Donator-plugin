@@ -210,10 +210,4 @@ The compiled plugin will be in `target/donator-1.0-SNAPSHOT.jar`.
 
 This plugin is designed for the Cherlsonia server community.
 
-## 🤝 Support
-
-For support, feature requests, or bug reports, please contact the development team.
-
----
-
 **Note**: This plugin is specifically designed for the Cherlsonia server and includes custom features for donator management and exclusive player benefits.
