@@ -1,0 +1,4 @@
+name: donator
+version: '1.0'
+main: org.donator.donator.Donator
+api-version: '1.21'
