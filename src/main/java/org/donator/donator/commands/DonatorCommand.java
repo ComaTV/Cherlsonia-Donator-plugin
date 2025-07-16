@@ -5,11 +5,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.donator.donator.DonatorManager;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DonatorCommand implements CommandExecutor {
     private final DonatorManager donatorManager;
@@ -25,7 +30,7 @@ public class DonatorCommand implements CommandExecutor {
             return true;
         }
         if (args.length != 3) {
-            sender.sendMessage(ChatColor.RED + "/donator [name] [car|investor|amandoua] [days]");
+            sender.sendMessage(ChatColor.RED + "/donator [name] [car|investor|both] [days]");
             return true;
         }
         String playerName = args[0];
@@ -34,9 +39,9 @@ public class DonatorCommand implements CommandExecutor {
         switch (type) {
             case "car": tag = "donator_car"; break;
             case "investor": tag = "donator_investor"; break;
-            case "amandoua": tag = "donator_ultra"; break;
+            case "both": tag = "donator_ultra"; break;
             default:
-                sender.sendMessage(ChatColor.RED + "Invalid type. Use car, investor, or amandoua.");
+                sender.sendMessage(ChatColor.RED + "Invalid type. Use car, investor, or both.");
                 return true;
         }
         int days;
@@ -56,4 +61,4 @@ public class DonatorCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.GREEN + "Donator rank set for " + playerName + ": " + tag + " until " + expiry.format(DateTimeFormatter.ISO_DATE));
         return true;
     }
-} 
+}

@@ -7,6 +7,7 @@ import org.donator.donator.commands.CommandManager;
 import org.donator.donator.commands.DonatorCommand;
 import org.donator.donator.commands.InvestorCommand;
 import org.donator.donator.events.DonatorListener;
+import org.donator.donator.commands.DonatorTabCompleter;
 
 public class Main extends JavaPlugin {
     private static Main instance;
@@ -26,6 +27,7 @@ public class Main extends JavaPlugin {
         getCommand("donator").setExecutor(new DonatorCommand(donatorManager));
         getCommand("investor").setExecutor(new InvestorCommand(donatorManager));
         getCommand("car").setExecutor(new CarCommand(donatorManager));
+        getCommand("donator").setTabCompleter(new DonatorTabCompleter());
 
         getLogger().info("Donator plugin enabled successfully!");
     }

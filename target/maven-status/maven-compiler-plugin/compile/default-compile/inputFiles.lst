@@ -1,6 +1,7 @@
 D:\Projects\server\plugins\Cherlsonia-Donator-plugin\src\main\java\org\donator\donator\commands\CarCommand.java
 D:\Projects\server\plugins\Cherlsonia-Donator-plugin\src\main\java\org\donator\donator\commands\CommandManager.java
 D:\Projects\server\plugins\Cherlsonia-Donator-plugin\src\main\java\org\donator\donator\commands\DonatorCommand.java
+D:\Projects\server\plugins\Cherlsonia-Donator-plugin\src\main\java\org\donator\donator\commands\DonatorTabCompleter.java
 D:\Projects\server\plugins\Cherlsonia-Donator-plugin\src\main\java\org\donator\donator\commands\InvestorCommand.java
 D:\Projects\server\plugins\Cherlsonia-Donator-plugin\src\main\java\org\donator\donator\DonatorManager.java
 D:\Projects\server\plugins\Cherlsonia-Donator-plugin\src\main\java\org\donator\donator\events\DonatorListener.java

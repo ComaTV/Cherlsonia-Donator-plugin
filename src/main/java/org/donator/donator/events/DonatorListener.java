@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.donator.donator.DonatorManager;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.Arrays;
 
@@ -69,6 +70,18 @@ public class DonatorListener implements Listener {
             donatorManager.applyTag(player, info.type);
         } else {
             donatorManager.removeAllTags(player);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        if (player.getScoreboardTags().contains("donator_investor") || player.getScoreboardTags().contains("donator_ultra")) {
+            // Elimină armura specială din drop-uri
+            event.getDrops().removeIf(item ->
+                item != null &&
+                item.getType().name().contains("DIAMOND_")
+            );
         }
     }
 } 

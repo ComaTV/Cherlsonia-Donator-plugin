@@ -6,7 +6,7 @@ load: STARTUP
 commands:
   donator:
     description: Grant a donator rank to a player (OP only)
-    usage: /donator <name> <car|investor|amandoua> <days>
+    usage: /donator <name> <car|investor|both> <days>
   investor:
     description: Receive special investor armor (donator_investor or donator_ultra only)
     usage: /investor
