@@ -1,199 +1,219 @@
-# Charless Plugin
+# Cherlsonia Donator Plugin
 
-A modular and extensible Minecraft plugin for Paper/Spigot servers.
+A comprehensive Minecraft plugin for Paper/Spigot servers that manages donator ranks, special privileges, and exclusive features for supporting players.
 
 ## 🏗️ Project Structure
 
 ```
-src/main/java/org/charless/charless/
+src/main/java/org/donator/donator/
 ├── Main.java                          # Main plugin class
-├── commands/                          # Modular command system
-│   ├── CommandManager.java           # Manager for all commands
-│   ├── AddWaypointCommand.java       # /addwaypoint command
-│   ├── DeleteWaypointCommand.java    # /delwaypoint command
-│   └── WaypointsCommand.java         # /waypoints command
-├── config/                           # Configuration system
-│   └── ConfigManager.java            # Configuration manager
-├── events/                           # Event system
-│   ├── EventManager.java             # Event manager
-│   └── GUIListener.java              # GUI interface listener
-├── utils/                            # Common utilities
-│   ├── MessageUtils.java             # Message utilities
-│   └── ValidationUtils.java          # Validation utilities
-└── waypoints/                        # Waypoint system
-    ├── WaypointManager.java          # Waypoint manager
-    └── WaypointMenuManager.java      # Menu manager
+├── DonatorManager.java                # Core donator management system
+├── commands/                          # Command system
+│   ├── CommandManager.java           # Command manager utility
+│   ├── DonatorCommand.java           # /donator command (OP only)
+│   ├── InvestorCommand.java          # /investor command
+│   ├── CarCommand.java               # /car command
+│   └── DonatorTabCompleter.java      # Tab completion for donator command
+└── events/                           # Event system
+    └── DonatorListener.java          # Event listener for donator features
 ```
 
 ## 🚀 Features
 
-### Waypoint System
-- **Command `/addwaypoint <name> [item]`** - Create a waypoint with custom item
-- **Command `/delwaypoint <name>`** - Delete a waypoint
-- **Command `/waypoints`** - Open the waypoints menu
-- **Tab Completion** - Intelligent suggestions for items
-- **GUI Menus** - Visual interfaces for navigation
+### Donator Rank System
+- **Three Donator Types**: `car`, `investor`, and `both` (ultra)
+- **Time-based Expiration**: Automatic rank expiration with configurable duration
+- **Persistent Storage**: YAML-based data storage for donator information
+- **Automatic Cleanup**: Expired ranks are automatically removed
 
-### Characteristics
-- ✅ **Modular** - Easy to extend with new systems
-- ✅ **Configurable** - Customizable messages and settings
-- ✅ **Validation** - Security checks and validation
-- ✅ **Messages** - Centralized message system
-- ✅ **Utilities** - Reusable common functions
+### Special Donator Features
+
+#### 🚗 Car Donator (`donator_car`)
+- **Command `/car`** - Summon a special rideable horse
+- **Unique Horse**: Custom-named, tamed horse with saddle
+- **One Horse Limit**: Players can only have one special horse at a time
+- **Death Tracking**: Horse death removes the special horse tag
+
+#### 💎 Investor Donator (`donator_investor`)
+- **Command `/investor`** - Receive special diamond armor set
+- **Custom Armor**: Named diamond armor with special lore
+- **Armor Protection**: Special armor is removed from death drops
+- **Slot Validation**: Requires empty armor slots to receive armor
+- **Removal Logic**: Removing any piece removes the entire set
+
+#### 🌟 Ultra Donator (`donator_ultra`)
+- **Combined Benefits**: Access to both car and investor features
+- **All Privileges**: Can use both `/car` and `/investor` commands
+
+### Administrative Features
+- **OP-only Management**: Only operators can grant donator ranks
+- **Flexible Duration**: Set donator status for any number of days
+- **Player Tracking**: Monitor donator status and expiration dates
+- **Automatic Tag Management**: Scoreboard tags for permission checking
 
 ## 📋 Commands
 
-| Command | Description | Permissions |
-|---------|-------------|-------------|
-| `/addwaypoint <name> [item]` | Create a waypoint with optional item | OP |
-| `/delwaypoint <name>` | Delete a waypoint | OP |
-| `/waypoints` | Open waypoints menu | All |
+| Command | Description | Permissions | Usage |
+|---------|-------------|-------------|-------|
+| `/donator <name> <type> <days>` | Grant donator rank to player | OP only | `/donator PlayerName car 30` |
+| `/investor` | Receive special investor armor | `donator_investor` or `donator_ultra` | `/investor` |
+| `/car` | Summon special rideable horse | `donator_car` or `donator_ultra` | `/car` |
+
+### Command Details
+
+#### `/donator` Command
+- **Permission**: Operator only (`isOp()`)
+- **Parameters**:
+  - `<name>`: Target player name
+  - `<type>`: `car`, `investor`, or `both`
+  - `<days>`: Duration in days
+- **Examples**:
+  - `/donator John car 30` - Grant car donator for 30 days
+  - `/donator Alice investor 60` - Grant investor donator for 60 days
+  - `/donator Bob both 90` - Grant ultra donator for 90 days
+
+#### `/investor` Command
+- **Permission**: Requires `donator_investor` or `donator_ultra` tag
+- **Requirements**: Empty armor slots
+- **Rewards**: Full set of custom diamond armor
+- **Features**:
+  - Custom names and lore for each piece
+  - Removed from death drops
+  - Complete set removal if any piece is removed
+
+#### `/car` Command
+- **Permission**: Requires `donator_car` or `donator_ultra` tag
+- **Requirements**: No existing special horse
+- **Rewards**: Custom tamed horse with saddle
+- **Features**:
+  - Custom name: "Donator Horse"
+  - Automatically tamed and saddled
+  - Player mounted automatically
+  - Death tracking for replacement
 
 ## ⚙️ Configuration
 
-The `config.yml` file contains all plugin settings:
+### Data Storage
+The plugin uses `donators.yml` for persistent storage:
 
 ```yaml
-# Waypoint System Configuration
-waypoints:
-  enabled: true
-  max_per_player: 10
-  default_item: ENDER_PEARL
-
-# Message Configuration
-messages:
-  prefix: "&8[&bCharless&8] &r"
-  waypoint_added: "&aWaypoint '%name%' added with item %item%!"
-  waypoint_deleted: "&cWaypoint deleted!"
-  # ... more messages
+players:
+  playername:
+    type: "donator_car"
+    expires: "2024-12-31"
 ```
 
-## 🔧 Extending the Plugin
+### Plugin Configuration
+The `config.yml` contains customizable settings (currently includes waypoint system configuration from the original template).
 
-### Adding a New Command
+## 🔧 Technical Implementation
 
-1. Create a new class in the `commands` package:
+### DonatorManager Class
+- **Data Management**: Handles loading/saving donator data
+- **Expiration Checking**: Automatic cleanup of expired ranks
+- **Tag Management**: Applies and removes scoreboard tags
+- **Player Tracking**: Manages donator information per player
 
-```java
-package org.charless.charless.commands;
+### Event System
+The `DonatorListener` handles various events:
 
-import org.bukkit.command.CommandSender;
-import org.charless.charless.utils.MessageUtils;
-import org.charless.charless.utils.ValidationUtils;
+1. **Armor Removal**: Removes entire special armor set if any piece is removed
+2. **Horse Death**: Clears special horse tag when horse dies
+3. **Player Join**: Checks and applies donator status on login
+4. **Player Death**: Prevents special armor from dropping
 
-public class MyNewCommand implements CommandManager.CommandExecutor {
-    
-    @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        if (!ValidationUtils.isPlayer(sender)) {
-            MessageUtils.sendError(sender, "Only players can use this command.");
-            return true;
-        }
-        
-        MessageUtils.sendSuccess(sender, "Command executed successfully!");
-        return true;
-    }
-}
-```
+### Permission System
+- Uses Bukkit's scoreboard tags for permission checking
+- Tags: `donator_car`, `donator_investor`, `donator_ultra`
+- Automatic tag application/removal based on donator status
 
-2. Register the command in `CommandManager.java`:
+## 🎯 Use Cases
 
-```java
-private void registerCommands() {
-    commands.put("addwaypoint", new AddWaypointCommand());
-    commands.put("delwaypoint", new DeleteWaypointCommand());
-    commands.put("waypoints", new WaypointsCommand());
-    commands.put("mynewcommand", new MyNewCommand()); // Add here
-}
-```
+### Server Administration
+- Reward players for donations with special privileges
+- Time-limited donator benefits
+- Easy management of donator ranks
 
-3. Add the command to `plugin.yml`:
+### Player Experience
+- Exclusive content for supporting players
+- Special vehicles and equipment
+- Unique gameplay features
 
-```yaml
-commands:
-  mynewcommand:
-    description: My new command description
-    usage: /mynewcommand
-```
+### Community Building
+- Incentivize server support
+- Create exclusive player groups
+- Reward loyal community members
 
-### Adding a New Listener
+## 🔒 Security Features
 
-1. Create a new class in the `events` package:
+- **Operator-only Commands**: Administrative commands require OP status
+- **Permission Validation**: All donator commands check for proper tags
+- **Data Validation**: Input validation for commands and data
+- **Safe Storage**: YAML-based configuration with error handling
 
-```java
-package org.charless.charless.events;
+## 📦 Building and Installation
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+### Prerequisites
+- Java 21 or higher
+- Maven 3.6+
+- Paper/Spigot server 1.21+
 
-public class MyNewListener implements Listener {
-    
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        // Event logic here
-    }
-}
-```
-
-2. Register the listener in `EventManager.java`:
-
-```java
-private void registerListeners() {
-    listeners.add(new GUIListener());
-    listeners.add(new MyNewListener()); // Add here
-}
-```
-
-### Adding a New System
-
-1. Create a new package for your system:
-
-```
-src/main/java/org/charless/charless/mysystem/
-├── MySystemManager.java
-└── MySystemCommand.java
-```
-
-2. Integrate the system in `Main.java`:
-
-```java
-public class Main extends JavaPlugin {
-    private MySystemManager mySystemManager;
-    
-    @Override
-    public void onEnable() {
-        // ... existing code ...
-        
-        // Initialize new system
-        mySystemManager = new MySystemManager(this);
-        
-        // ... existing code ...
-    }
-}
-```
-
-## 🎨 Customizing Messages
-
-All messages can be customized in `config.yml`:
-
-```yaml
-messages:
-  prefix: "&8[&bCharless&8] &r"
-  waypoint_added: "&aWaypoint '%name%' added with item %item%!"
-  waypoint_deleted: "&cWaypoint deleted!"
-```
-
-Use `%variable%` to replace dynamic values in messages.
-
-## 🔒 Permissions
-
-The plugin uses operator permissions (`isOp()`) for administrative commands. For a more advanced permission system, you can integrate Vault or LuckPerms.
-
-## 📦 Building
-
+### Building
 ```bash
 mvn clean package
 ```
 
-The compiled plugin will be in `target/charless-1.0-SNAPSHOT.jar`.
+The compiled plugin will be in `target/donator-1.0-SNAPSHOT.jar`.
+
+### Installation
+1. Build the plugin using Maven
+2. Copy the JAR file to your server's `plugins/` folder
+3. Restart your server
+4. Use `/donator` command to grant donator ranks
+
+## 🚀 Getting Started
+
+### For Server Administrators
+1. **Grant Donator Rank**:
+   ```
+   /donator PlayerName car 30
+   ```
+
+2. **Check Donator Status**:
+   - Players with donator ranks will have scoreboard tags
+   - Use `/scoreboard players list` to see all tags
+
+3. **Manage Expirations**:
+   - Expired ranks are automatically removed
+   - Check `plugins/donator/donators.yml` for current data
+
+### For Players
+1. **Car Donators**: Use `/car` to summon your special horse
+2. **Investor Donators**: Use `/investor` to receive special armor
+3. **Ultra Donators**: Access both features with `/car` and `/investor`
+
+## 🔄 Extending the Plugin
+
+### Adding New Donator Types
+1. Add new type handling in `DonatorCommand.java`
+2. Create corresponding command class
+3. Update permission checks in event listeners
+4. Add new scoreboard tag logic
+
+### Adding New Features
+1. Create new command class in `commands/` package
+2. Register command in `Main.java`
+3. Add to `plugin.yml`
+4. Implement permission checking using scoreboard tags
+
+## 📝 License
+
+This plugin is designed for the Cherlsonia server community.
+
+## 🤝 Support
+
+For support, feature requests, or bug reports, please contact the development team.
+
+---
+
+**Note**: This plugin is specifically designed for the Cherlsonia server and includes custom features for donator management and exclusive player benefits.
