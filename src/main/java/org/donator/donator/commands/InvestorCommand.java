@@ -45,7 +45,6 @@ public class InvestorCommand implements CommandExecutor {
             player.sendMessage(ChatColor.RED + "Your armor slots must be empty to receive the special armor.");
             return true;
         }
-        // Creez armura specială cu nume și lore custom
         ItemStack helmet = new ItemStack(Material.DIAMOND_HELMET);
         ItemMeta helmetMeta = helmet.getItemMeta();
         helmetMeta.setDisplayName(ChatColor.GOLD + "Investor Helmet");

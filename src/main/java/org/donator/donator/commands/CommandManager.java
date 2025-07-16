@@ -8,12 +8,10 @@ import java.util.List;
 
 public class CommandManager implements TabCompleter {
     public CommandManager(org.donator.donator.DonatorManager donatorManager) {
-        // Nu mai există comenzi de waypoints
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        // Nu există tab completare pentru donator/investor/car
         return new ArrayList<>();
     }
 } 

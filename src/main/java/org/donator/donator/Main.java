@@ -18,11 +18,9 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         instance = this;
         
-        // Initialize donator system
         donatorManager = new DonatorManager(getDataFolder());
         getServer().getPluginManager().registerEvents(new DonatorListener(donatorManager), this);
 
-        // Initialize command system
         commandManager = new CommandManager(donatorManager);
         getCommand("donator").setExecutor(new DonatorCommand(donatorManager));
         getCommand("investor").setExecutor(new InvestorCommand(donatorManager));

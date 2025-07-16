@@ -38,7 +38,6 @@ public class DonatorManager {
     }
 
     public void applyTag(Player player, String tag) {
-        // Poți folosi scoreboard teams, permissions sau metadata. Exemplu simplu:
         player.addScoreboardTag(tag);
     }
 

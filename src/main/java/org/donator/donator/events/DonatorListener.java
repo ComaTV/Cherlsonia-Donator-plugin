@@ -22,17 +22,14 @@ public class DonatorListener implements Listener {
         this.donatorManager = donatorManager;
     }
 
-    // 1. Șterge armura specială dacă jucătorul scoate o piesă
     @EventHandler
     public void onArmorRemove(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
         Player player = (Player) event.getWhoClicked();
-        // Dacă slotul e de armură și piesa scoasă e diamond
         int slot = event.getSlot();
-        if (slot >= 36 && slot <= 39) { // armor slots
+        if (slot >= 36 && slot <= 39) {
             ItemStack item = event.getCurrentItem();
             if (item != null && item.getType().name().contains("DIAMOND_")) {
-                // Scoate toată armura dacă are tag de donator
                 if (player.getScoreboardTags().contains("donator_investor") || player.getScoreboardTags().contains("donator_ultra")) {
                     Arrays.asList(player.getInventory().getArmorContents()).forEach(i -> {
                         if (i != null) i.setAmount(0);
@@ -44,7 +41,6 @@ public class DonatorListener implements Listener {
         }
     }
 
-    // 2. Șterge tagul has_special_horse când calul moare
     @EventHandler
     public void onHorseDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
@@ -60,7 +56,6 @@ public class DonatorListener implements Listener {
         }
     }
 
-    // 3. Verifică expirarea rangurilor la login
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -77,7 +72,6 @@ public class DonatorListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         if (player.getScoreboardTags().contains("donator_investor") || player.getScoreboardTags().contains("donator_ultra")) {
-            // Elimină armura specială din drop-uri
             event.getDrops().removeIf(item ->
                 item != null &&
                 item.getType().name().contains("DIAMOND_")
