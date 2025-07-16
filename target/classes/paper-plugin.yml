@@ -2,15 +2,3 @@ name: donator
 version: '1.0'
 main: org.donator.donator.Main
 api-version: '1.21'
-
-commands:
-  donator:
-    description: Administrează donatorii
-    usage: /donator <player> <tip> <zile>
-    permission: donator.admin
-  investor:
-    description: Primești armura specială de investor
-    usage: /investor
-  car:
-    description: Invocă mașina ta (cal schelet)
-    usage: /car
