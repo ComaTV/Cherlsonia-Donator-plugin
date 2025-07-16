@@ -1,24 +1,40 @@
 package org.donator.donator;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import io.papermc.paper.command.CommandManager;
+import org.donator.donator.DonatorManager;
+import org.donator.donator.commands.CarCommand;
+import org.donator.donator.commands.CommandManager;
+import org.donator.donator.commands.DonatorCommand;
+import org.donator.donator.commands.InvestorCommand;
+import org.donator.donator.events.DonatorListener;
 
-public final class Main extends JavaPlugin {
-
+public class Main extends JavaPlugin {
+    private static Main instance;
+    private CommandManager commandManager;
     private DonatorManager donatorManager;
 
     @Override
     public void onEnable() {
-        donatorManager = new DonatorManager(this);
-        CommandManager cm = this.getServer().getCommandManager();
-        cm.register("donator", new DonatorCommand(this, donatorManager));
-        cm.register("investor", new InvestorCommand(donatorManager));
-        cm.register("car", new CarCommand(this, donatorManager));
-        getServer().getPluginManager().registerEvents(new DonatorListener(), this);
+        instance = this;
+        
+        // Initialize donator system
+        donatorManager = new DonatorManager(getDataFolder());
+        getServer().getPluginManager().registerEvents(new DonatorListener(donatorManager), this);
+
+        // Initialize command system
+        commandManager = new CommandManager(donatorManager);
+        getCommand("donator").setExecutor(new DonatorCommand(donatorManager));
+        getCommand("investor").setExecutor(new InvestorCommand(donatorManager));
+        getCommand("car").setExecutor(new CarCommand(donatorManager));
+
+        getLogger().info("Donator plugin enabled successfully!");
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
+    public static Main getInstance() {
+        return instance;
+    }
+
+    public DonatorManager getDonatorManager() {
+        return donatorManager;
     }
 }

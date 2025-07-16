@@ -1,0 +1,15 @@
+name: donator
+version: '1.0'
+main: org.donator.donator.Main
+api-version: '1.21'
+load: STARTUP
+commands:
+  donator:
+    description: Grant a donator rank to a player (OP only)
+    usage: /donator <name> <car|investor|amandoua> <days>
+  investor:
+    description: Receive special investor armor (donator_investor or donator_ultra only)
+    usage: /investor
+  car:
+    description: Summon a special rideable entity (donator_car or donator_ultra only)
+    usage: /car

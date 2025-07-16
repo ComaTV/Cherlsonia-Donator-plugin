@@ -3,83 +3,92 @@ package org.donator.donator;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class DonatorManager {
-    private final JavaPlugin plugin;
     private final File file;
-    private FileConfiguration config;
-    private final Map<UUID, DonatorInfo> donators = new HashMap<>();
+    private final FileConfiguration config;
+    private final Map<String, DonatorInfo> donators = new HashMap<>();
 
-    public DonatorManager(JavaPlugin plugin) {
-        this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder(), "donators.yml");
+    public DonatorManager(File dataFolder) {
+        this.file = new File(dataFolder, "donators.yml");
+        this.config = YamlConfiguration.loadConfiguration(file);
         load();
     }
 
-    public void load() {
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            plugin.saveResource("donators.yml", false);
+    public void setDonator(String playerName, String type, LocalDate expiry) {
+        DonatorInfo info = new DonatorInfo(type, expiry);
+        donators.put(playerName.toLowerCase(), info);
+        save();
+    }
+
+    public DonatorInfo getDonator(String playerName) {
+        return donators.get(playerName.toLowerCase());
+    }
+
+    public void removeDonator(String playerName) {
+        donators.remove(playerName.toLowerCase());
+        save();
+    }
+
+    public void applyTag(Player player, String tag) {
+        // Poți folosi scoreboard teams, permissions sau metadata. Exemplu simplu:
+        player.addScoreboardTag(tag);
+    }
+
+    public void removeAllTags(Player player) {
+        player.getScoreboardTags().removeIf(tag -> tag.startsWith("donator_"));
+    }
+
+    public void checkExpiries() {
+        LocalDate today = LocalDate.now();
+        for (Map.Entry<String, DonatorInfo> entry : new HashMap<>(donators).entrySet()) {
+            if (entry.getValue().expiry.isBefore(today) || entry.getValue().expiry.isEqual(today)) {
+                Player player = Bukkit.getPlayerExact(entry.getKey());
+                if (player != null) removeAllTags(player);
+                donators.remove(entry.getKey());
+            }
         }
-        config = YamlConfiguration.loadConfiguration(file);
+        save();
+    }
+
+    private void load() {
         donators.clear();
-        if (config.isConfigurationSection("donators")) {
-            for (String uuidStr : config.getConfigurationSection("donators").getKeys(false)) {
-                UUID uuid = UUID.fromString(uuidStr);
-                String type = config.getString("donators." + uuidStr + ".type");
-                String expires = config.getString("donators." + uuidStr + ".expires");
-                donators.put(uuid, new DonatorInfo(type, expires));
+        if (config.contains("players")) {
+            for (String key : config.getConfigurationSection("players").getKeys(false)) {
+                String type = config.getString("players." + key + ".type");
+                String expiryStr = config.getString("players." + key + ".expires");
+                LocalDate expiry = LocalDate.parse(expiryStr);
+                donators.put(key.toLowerCase(), new DonatorInfo(type, expiry));
             }
         }
     }
 
-    public void save() {
-        config.set("donators", null);
-        for (Map.Entry<UUID, DonatorInfo> entry : donators.entrySet()) {
-            String path = "donators." + entry.getKey();
-            config.set(path + ".type", entry.getValue().type);
-            config.set(path + ".expires", entry.getValue().expires);
+    private void save() {
+        config.set("players", null);
+        for (Map.Entry<String, DonatorInfo> entry : donators.entrySet()) {
+            config.set("players." + entry.getKey() + ".type", entry.getValue().type);
+            config.set("players." + entry.getKey() + ".expires", entry.getValue().expiry.toString());
         }
         try {
             config.save(file);
         } catch (IOException e) {
-            Bukkit.getLogger().severe("Could not save donators.yml: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    public void addDonator(UUID uuid, String type, LocalDate expires) {
-        donators.put(uuid, new DonatorInfo(type, expires.toString()));
-        save();
-    }
-
-    public boolean isDonator(UUID uuid, String type) {
-        DonatorInfo info = donators.get(uuid);
-        if (info == null) return false;
-        if (!info.type.equalsIgnoreCase(type) && !info.type.equalsIgnoreCase("ultra")) return false;
-        LocalDate now = LocalDate.now();
-        LocalDate exp = LocalDate.parse(info.expires);
-        return now.isBefore(exp) || now.isEqual(exp);
-    }
-
-    public String getDonatorType(UUID uuid) {
-        DonatorInfo info = donators.get(uuid);
-        return info != null ? info.type : null;
-    }
-
-    private static class DonatorInfo {
-        String type;
-        String expires;
-        DonatorInfo(String type, String expires) {
+    public static class DonatorInfo {
+        public final String type;
+        public final LocalDate expiry;
+        public DonatorInfo(String type, LocalDate expiry) {
             this.type = type;
-            this.expires = expires;
+            this.expiry = expiry;
         }
     }
 } 
